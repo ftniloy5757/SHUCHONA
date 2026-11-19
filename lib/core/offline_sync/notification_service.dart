@@ -84,6 +84,7 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin _plugin =
       FlutterLocalNotificationsPlugin();
   bool _initialized = false;
+  bool _permissionRequested = false;
 
   Future<void> init() async {
     if (_initialized) return;
@@ -111,8 +112,40 @@ class NotificationService {
     }
   }
 
+  /// Requests Android 13+ (API 33+) `POST_NOTIFICATIONS` and iOS alert permissions
+  /// at runtime so medication voice alarms and Blood SOS alerts are never silently blocked.
+  Future<bool> requestPermissions() async {
+    if (!_initialized) await init();
+    if (!_initialized || kIsWeb) return false;
+    _permissionRequested = true;
+    try {
+      final android = _plugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null) {
+        final granted = await android.requestNotificationsPermission();
+        return granted ?? true;
+      }
+      final ios = _plugin.resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) {
+        final granted = await ios.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        );
+        return granted ?? false;
+      }
+    } catch (e) {
+      debugPrint('SHUCHONA notification permission request note: $e');
+    }
+    return false;
+  }
+
   Future<void> scheduleDailyReminder(ScheduledVoiceReminder reminder) async {
     if (!_initialized || !reminder.enabled) return;
+    if (!_permissionRequested) {
+      await requestPermissions();
+    }
     try {
       final now = tz.TZDateTime.now(tz.local);
       var scheduled = tz.TZDateTime(
@@ -167,6 +200,9 @@ class NotificationService {
     required String body,
   }) async {
     if (!_initialized) return;
+    if (!_permissionRequested) {
+      await requestPermissions();
+    }
     try {
       const details = NotificationDetails(
         android: AndroidNotificationDetails(

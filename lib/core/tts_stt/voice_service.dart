@@ -131,7 +131,7 @@ class VoiceController extends StateNotifier<VoiceState> {
   }
 
   Future<bool> _ensureSttInitialized() async {
-    if (_sttInitialized) return state.sttAvailable;
+    if (_sttInitialized && state.sttAvailable) return true;
     try {
       final ok = await _stt.initialize(
         onStatus: (status) {
@@ -149,12 +149,12 @@ class VoiceController extends StateNotifier<VoiceState> {
           );
         },
       );
-      _sttInitialized = true;
+      _sttInitialized = ok;
       state = state.copyWith(sttAvailable: ok);
       return ok;
     } catch (e) {
       debugPrint('SHUCHONA STT init unavailable on this platform: $e');
-      _sttInitialized = true;
+      _sttInitialized = false;
       state = state.copyWith(sttAvailable: false);
       return false;
     }

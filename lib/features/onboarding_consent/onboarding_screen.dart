@@ -5,6 +5,7 @@ import 'package:shuchona/core/constants/app_constants.dart';
 import 'package:shuchona/core/localization/app_strings.dart';
 import 'package:shuchona/core/offline_sync/app_state_providers.dart';
 import 'package:shuchona/core/offline_sync/firebase_bootstrap_service.dart';
+import 'package:shuchona/core/offline_sync/notification_service.dart';
 import 'package:shuchona/core/theme/app_colors.dart';
 import 'package:shuchona/core/tts_stt/tts_listen_button.dart';
 import 'package:shuchona/core/tts_stt/voice_service.dart';
@@ -98,6 +99,9 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   Future<void> _acceptConsentAndEnter() async {
     await ref.read(voiceControllerProvider.notifier).stopSpeaking();
     await ref.read(userSessionProvider.notifier).acceptInformedConsent();
+    // Request Android 13+ notification permission right after consent so
+    // medication voice alarms and emergency Blood SOS alerts work immediately.
+    await NotificationService.instance.requestPermissions();
     if (mounted) {
       context.go('/home');
     }

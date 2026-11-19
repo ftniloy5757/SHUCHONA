@@ -145,9 +145,14 @@ class FindCareNotifier extends StateNotifier<FindCareState> {
 
   /// One-tap helpline & clinic phone dialer using `url_launcher`.
   static Future<bool> dialPhoneNumber(String number) async {
-    final cleaned = number.replaceAll(RegExp(r'[^0-9+]'), '');
+    final cleaned = number.replaceAll(RegExp(r'[^0-9+*#]'), '');
     final uri = Uri(scheme: 'tel', path: cleaned);
     try {
+      final launched = await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+      if (launched) return true;
       if (await canLaunchUrl(uri)) {
         return launchUrl(uri);
       }

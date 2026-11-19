@@ -6,6 +6,28 @@ Built with **Flutter (Material 3)**, **Riverpod**, **GoRouter**, **Hive**, **Fir
 
 ---
 
+## Download & Install on Android (Direct APK)
+
+[![Download SHUCHONA Android APK](https://img.shields.io/badge/Download_APK-SHUCHONA_v1.0.0_(41.8_MB)-0D6E6E?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ftniloy5757/SHUCHONA/raw/main/releases/SHUCHONA-v1.0.0.apk)
+
+- **Direct APK Link:** [releases/SHUCHONA-v1.0.0.apk](https://github.com/ftniloy5757/SHUCHONA/raw/main/releases/SHUCHONA-v1.0.0.apk)
+- **Compatibility:** Android 7.0+ (`minSdk 24`, `targetSdk 36` — supports both 64-bit `arm64-v8a` and 32-bit `armeabi-v7a` Android devices)
+- **Signing:** Signed Release APK (APK Signature Scheme v2 + v3)
+- **SHA-256:** `aa0643cfae8a68a1acc67165297bdf5009e39114a747fd141e4c6cf1fc9826bb`
+
+### Installation Steps on Any Android Phone
+1. Tap the **Download APK** button above on your Android device to download `SHUCHONA-v1.0.0.apk`.
+2. Open the downloaded file from your browser or **Files** app. If prompted by Android, tap **Settings → Allow from this source** (required once for APKs installed outside Google Play), then tap **Install**.
+3. Open **SHUCHONA (সূচনা)** — you can start immediately in **Offline Demo Mode** with zero account or API setup.
+
+### Runtime Permissions Requested (On-Demand)
+- **Notifications (`POST_NOTIFICATIONS`):** Prompted after onboarding consent for daily Bangla voice dosage alarms and emergency Blood SOS alerts.
+- **Microphone (`RECORD_AUDIO`):** Prompted when tapping the voice mic in the Bangla/English AI Chatbot.
+- **Camera (`CAMERA`):** Prompted when snapping a handwritten prescription in PrescribeSafe BD (Gallery uses Android's built-in Photo Picker).
+- **Location (`ACCESS_COARSE_LOCATION` / `ACCESS_FINE_LOCATION`):** Prompted only when tapping **GPS** in Find Care to sort nearby Upazila Health Complexes by live distance.
+
+---
+
 ## Core Architecture (Feature-First Clean Architecture)
 
 ```text
