@@ -1,0 +1,109 @@
+You are a Principal Flutter Architect, Healthcare AI Engineer, and Enterprise Product Designer. Build **SHUCHONA (সূচনা)** from scratch—an offline-first, voice-and-vision AI healthcare, prescription safety, behavioral wellness, and community emergency mobile application built with **Flutter** and **Firebase** for rural women’s self-help groups (SHGs) and youth networks in Bangladesh.
+
+====================================================================
+1. DESIGN PHILOSOPHY: ENTERPRISE-GRADE + LOW-LITERACY ACCESSIBILITY
+====================================================================
+Deliver an enterprise-polished UI/UX (comparable to modern digital health and fintech platforms) engineered specifically for first-time and low-literacy smartphone users:
+- **Typography & Localization:** Pair `Noto Sans Bengali` for Bangla and `Plus Jakarta Sans` for English using `google_fonts`. Support instant runtime switching between **বাংলা (Bangla - Default)** and **English** across every screen, label, and voice prompt.
+- **Color System & Contrast (WCAG AAA):**
+  - Primary Brand: Deep Clinical Teal `#0D6E6E` (trustworthy, calm, high-contrast)
+  - Secondary / Active Accent: Soft Emerald `#10B981`
+  - Alert / Craving SOS / Blood Emergency: Warm Crimson `#DC2626`
+  - Caution / Pharmacist Verify: Amber `#D97706`
+  - Surface & Cards: Off-White Canvas `#F8FAFC`, Pure White Cards `#FFFFFF` with `1px solid #E2E8F0` hairline borders, subtle elevation, and `16dp`–`20dp` border radius.
+  - Include a one-tap **High-Contrast / Dark Mode** toggle (`#090D16` pitch-slate background with `#FFFFFF` text and `#38BDF8` electric-blue accents) in the top app bar.
+- **Audio-First & Zero-Clutter Affordances:**
+  - Every card, instruction, symptom result, and prescription item must include a prominent **Speaker (🔊 Listen)** button that reads the content aloud in natural Bangla/English via TTS.
+  - Minimum touch target size of `56dp x 56dp` for all buttons. Use oversized custom vector icons, color-coded severity badges, progress rings, and a persistent centered floating Voice Microphone button (`সূচনা কে বলুন` / `Speak to SHUCHONA`) on the bottom navigation bar.
+  - Include an **SHG Facilitator Guest Mode** toggle on the home header so a self-help group leader can run zero-trace voice sessions for group members on a shared phone without polluting her personal logs.
+
+====================================================================
+2. TECH STACK & CLEAN ARCHITECTURE
+====================================================================
+- **Framework:** Flutter (latest stable SDK, Material 3, null-safe Dart).
+- **State Management & Routing:** `flutter_riverpod` + `go_router`.
+- **Backend & Offline-First Persistence:**
+  - `firebase_core`, `firebase_auth`, `cloud_firestore` (with `persistenceEnabled: true`), `firebase_messaging`.
+  - `hive_flutter` for fast local encrypted caching of offline habit logs, saved wellness tips, deterministic red-flag triage trees, active voice medication alarms, and local clinic directories, with an automatic background sync queue when connectivity returns.
+  - *Important:* Architect a clean repository layer with a `DemoFallbackService` so that if Firebase credentials are not yet configured locally, the app boots seamlessly in **Live Local/Offline Mode** with full functionality rather than crashing on startup.
+- **AI, Vision & Speech Packages:**
+  - `google_generative_ai` (configured via `--dart-define=GEMINI_API_KEY=...`) for multimodal prescription vision OCR and safety-grounded conversational guidance.
+  - `speech_to_text` for Bangla (`bn_BD`) and English (`en_US`) voice input with animated audio waveform feedback.
+  - `flutter_tts` for Bangla and English read-aloud responses and scheduled medication voice alarms.
+  - `image_picker` for capturing handwritten prescriptions via camera or gallery.
+  - `flutter_local_notifications` + `timezone` for scheduled habit check-ins, daily tips, and PrescribeSafe BD dosage reminders.
+  - `fl_chart` for clean weekly mood and habit adherence charts.
+  - `geolocator` + `url_launcher` for Upazila proximity and one-tap helpline dialing (`16263`).
+
+Organize the codebase using Feature-First Clean Architecture:
+`lib/core/{theme,localization,constants,offline_sync,tts_stt,seed_data}`
+`lib/features/{onboarding_consent,home_dashboard,voice_chatbot,womens_symptom_guide,prescribe_safe,habit_tracker,leaderboard,blood_alert,craving_sos,mental_wellness,find_care,admin_dashboard}`
+
+====================================================================
+3. COMPLETE 18-MODULE FUNCTIONAL SPECIFICATION
+====================================================================
+
+### MODULE 1: Authentication & Audio-Visual Informed Consent
+- Clean onboarding with Phone OTP or Email sign-up (plus a one-tap "Continue in Offline Demo Mode" option for instant testing).
+- Mandatory **Informed Data Consent Screen** before any user profile or health data is saved: explains in plain Bangla and English how data is kept private and anonymized, featuring an auto-playable **"🔊 Listen to Consent"** button and an explicit **"I Agree & Continue"** action.
+
+### MODULE 2, 3 & 4: Multilingual Safety-Aligned AI Chatbot (Voice STT + TTS)
+- Chat interface supporting both **Push-to-Talk Bangla/English Voice Input** (with live waveform indicator) and text input.
+- Every assistant message renders as a structured card with a **🔊 Read Aloud** button.
+- System prompt enforces warm, non-stigmatizing, low-literacy Bangla/English responses grounded in WHO and DGHS Bangladesh health education guidelines, strictly prohibiting medical diagnoses or new prescriptions.
+
+### MODULE 5 & 6: Women’s Health Symptom Guide & Deterministic Red-Flag Engine
+- Guided voice or icon-assisted symptom intake covering irregular periods, severe menstrual cramps, hormonal/PCOS indicators, breast lump or pain, and general reproductive wellness.
+- **Tier 1 Deterministic On-Device Red-Flag Gatekeeper:** Runs *before* any LLM API call. Scans Bangla and English inputs for red-flag keywords (e.g., severe heavy bleeding/hemorrhage, fainting, hard/fixed breast lump with skin dimpling or nipple discharge, pregnancy bleeding, self-harm). If matched, immediately displays a high-priority crimson **Urgent Warning Card** with spoken Bangla alert: *"জরুরি সতর্কতা: অনুগ্রহ করে দেরি না করে দ্রুত নিকটস্থ হাসপাতাল বা ডাক্তারের পরামর্শ নিন"* and a one-tap **Call 16263 / Find Clinic** button.
+- **Tier 2 Grounded Symptom Exploration:** Asks 2–3 structured follow-up questions, explains in simple language which common conditions (e.g., PCOS, PMS, benign vs. concerning breast changes) the symptom patterns may relate to, provides a transparent **"Why This Guidance?"** explanation pill, and permanently pins the mandatory disclaimer on every result:
+  - English: *"This is AI guidance only, not a medical diagnosis. Please consult a doctor."*
+  - Bangla: *"এটি শুধুমাত্র AI-ভিত্তিক প্রাথমিক তথ্য, কোনো চিকিৎসা নির্ণয় নয়। অনুগ্রহ করে একজন ডাক্তারের পরামর্শ নিন।"*
+
+### MODULE 7: PrescribeSafe BD — Handwritten Prescription & Generic Drug Guard
+- Camera/gallery capture flow where users snap a photo of a handwritten Bangladeshi prescription (include 2 realistic sample Bangladeshi prescription test cases in assets so judges can test with one tap even without a physical paper).
+- **Multimodal Vision + DGDA/DIMS RAG Pipeline:**
+  1. Extracts prescribed medications, strengths, durations, and local shorthand (`1+0+1`, `আহারের পর / খাওয়ার আগে`).
+  2. Matches extracted drugs against a bundled local **DGDA/DIMS Bangladesh Drug Dataset** (minimum 35 common Bangladeshi brands & generics with real BDT ৳ unit prices, active ingredients, and interaction rules).
+  3. **Confidence Gate:** If OCR confidence for a medication is `< 85%`, displays an amber **"Verify with Local Pharmacist"** warning badge rather than guessing.
+  4. **Drug-Drug Interaction (DDI) & Duplicate Ingredient Check:** Flags dangerous multi-doctor combinations or duplicate active ingredients in red with clear Bangla audio explanations.
+  5. **Generic Price Savings Card:** Displays cheaper DGDA-approved local generic equivalents side-by-side with exact BDT (৳) savings percentage.
+  6. **One-Tap Bangla Voice Dosage Scheduler:** Converts the extracted schedule (`1+0+1`) into scheduled local notifications that speak the exact instruction in Bangla (`"সকালের ওষুধ খাওয়ার সময় হয়েছে — ১টি ট্যাবলেট খাওয়ার পরে"`).
+
+### MODULE 8 & 9: Habit Tracker & Privacy-Safe Habit Improvement Leaderboard
+- **Habit Tracker:** Visual icon grid to build healthy habits (Drink 8 Glasses Water, Iron/Folic Acid Tablet, 20-Min Walk, Sleep Before 11 PM) or quit harmful habits (Betel Nut/Jarda, Smoking, Excess Sugar). Features one-tap daily check-ins, animated streak counters, and offline caching.
+- **Habit Improvement Leaderboard:** Privacy-preserving leaderboard where users appear under selectable nature/floral avatars and pseudonyms (or compete as a village Self-Help Group cohort). Ranked by **Weekly Improvement XP (% streak growth)** rather than raw totals so newcomers can win, without revealing which specific habit a user is tracking.
+
+### MODULE 10: Geofenced Blood Demand Alert Network
+- Users opt in with their blood group (`A+, A-, B+, B-, O+, O-, AB+, AB-`, or `Unknown - Find Free Test`), Upazila/District, and last donation date (enforcing a 90-day medical cooldown).
+- **One-Tap Blood SOS Broadcast:** Users or community health workers can post an urgent blood request (Blood Group, Units Needed, Hospital Name, Urgency Level). Filters eligible out-of-cooldown donors in the same Upazila, triggers a high-priority Bangla voice/push alert simulation, and tracks donor responses (`I Can Donate` / `Share`).
+
+### MODULE 11: One-Tap Craving & Crisis Support Mode
+- Prominent **"আমি কষ্টে আছি / I’m Struggling"** emergency button on the home dashboard.
+- Opens an immediate calming full-screen modal featuring an interactive **4-4-6 Guided Breathing Animation** with spoken Bangla audio pacing, 3 step-by-step grounding/coping cards, and a direct one-tap fallback button to call a live human counselor / national helpline (`16263` / `Kaan Pete Roi`).
+
+### MODULE 12 & 13: Mental Wellness Tips, Weekly Mood Analytics & Personalized Guidance
+- Daily voice-enabled Bangla/English mental wellness micro-tip card.
+- 5-emoji daily mood check-in (`খুব ভালো` to `খুব খারাপ`) visualized on a clean `fl_chart` 7-day mood & habit consistency chart.
+- **Context-Aware Personalized Guidance:** Rule-and-AI engine on the home screen that generates tailored daily nudges based on the user's recent mood dips, missed habit streaks, or active PrescribeSafe medication schedules.
+
+### MODULE 14, 15, 16 & 17: Find Care Directory, Offline Sync, Low-Literacy UI & Smart Reminders
+- **Find Care Info:** Offline-accessible directory of nearby Upazila Health Complexes, Community Clinics, Women's Health Centers, and National Helplines with distance tags, spoken Bangla directions summary, and one-tap Call buttons.
+- **Offline Sync Indicator:** Subtle status pill in the header (`অনলাইন / সিঙ্ক সম্পন্ন` vs. `অফলাইন মোড — তথ্য সংরক্ষিত আছে`) demonstrating real-time offline queueing and sync.
+- **Smart Local Reminders:** Customizable morning/evening voice-assisted notification triggers.
+
+### MODULE 18: Privacy-Preserving Admin Impact Dashboard
+- Accessible via a role switcher in Settings/Header (`Community User View` ↔ `NGO / Admin Impact Dashboard`).
+- Displays strictly anonymized, PII-stripped population health analytics using `fl_chart`:
+  - Total Active Self-Help Group Members & Offline Check-ins
+  - Top Anonymized Symptom Clusters by Upazila (e.g., PCOS/Cycle Irregularity, Anemia/Fatigue)
+  - Total Estimated Patient Medication Savings (in BDT ৳) via PrescribeSafe BD generic substitutions
+  - Blood Demand Alert Fulfillment Rate & Average Donor Response Time
+  - Explicit badge confirming: *"Zero PII Stored — All Identifiers Stripped On-Device Before Aggregation."*
+
+====================================================================
+4. EXECUTION INSTRUCTIONS
+====================================================================
+1. Generate `pubspec.yaml` with all required dependencies and configure Google Fonts (`Noto Sans Bengali`, `Plus Jakarta Sans`).
+2. Create rich, realistic Bangladeshi seed datasets in `lib/core/seed_data/` (DGDA/DIMS drug catalog, DDI matrix, sample prescription presets, Upazila clinics, red-flag clinical rules, SHG leaderboard data, and blood donor records) so every screen is interactive out of the box.
+3. Implement every screen, state provider, offline cache repository, TTS/STT service, and Gemini API service completely—**do not leave `TODO` placeholders or stubbed screens**.
+4. Run `flutter analyze` and fix any warnings or type errors before finishing.
