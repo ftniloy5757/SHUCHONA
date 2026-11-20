@@ -534,6 +534,28 @@ class _FindCareScreenState extends ConsumerState<FindCareScreen> {
                   }
                 },
               ),
+              const Divider(height: 24),
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: const Icon(Icons.verified_user_rounded,
+                    color: AppColors.indigoSoft),
+                title: Text(
+                  s.tr('লগইন ও গোপনীয়তা সম্মতি দেখুন',
+                      'Account, Login & Privacy Consent'),
+                  style: const TextStyle(fontWeight: FontWeight.w800),
+                ),
+                subtitle: Text(
+                  s.tr(
+                    'অটো-ডেমো সেশন • চাইলে ফোন OTP বা ইমেইল দিয়ে সাইন ইন করুন',
+                    'Auto Demo Active • Switch to Phone OTP / Email or review consent',
+                  ),
+                ),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () {
+                  ref.read(adminRoleProvider.notifier).state = false;
+                  ref.read(userSessionProvider.notifier).signOutToOnboarding();
+                },
+              ),
             ],
           ),
         ),

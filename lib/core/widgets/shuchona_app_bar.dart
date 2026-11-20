@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:shuchona/core/localization/app_strings.dart';
 import 'package:shuchona/core/offline_sync/app_state_providers.dart';
 import 'package:shuchona/core/theme/app_colors.dart';
+import 'package:shuchona/core/widgets/shuchona_logo.dart';
 
 /// Shared Enterprise Top App Bar featuring:
 /// - Instant Bangla <-> English runtime switcher
@@ -51,26 +52,7 @@ class ShuchonaAppBar extends ConsumerWidget implements PreferredSizeWidget {
       title: Row(
         children: [
           if (!showBackButton) ...[
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: isDark
-                    ? AppColors.darkAccentBlue
-                    : AppColors.primaryTeal,
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: Center(
-                child: Text(
-                  'সূ',
-                  style: TextStyle(
-                    color: isDark ? AppColors.darkCanvas : Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ),
-            ),
+            const ShuchonaLogo(size: 38),
             const SizedBox(width: 10),
           ],
           Expanded(
@@ -148,6 +130,9 @@ class ShuchonaAppBar extends ConsumerWidget implements PreferredSizeWidget {
               if (currentPath != '/wellness') {
                 context.push('/wellness');
               }
+            } else if (value == 'onboarding') {
+              ref.read(adminRoleProvider.notifier).state = false;
+              ref.read(userSessionProvider.notifier).signOutToOnboarding();
             }
           },
           itemBuilder: (context) => [
@@ -217,6 +202,23 @@ class ShuchonaAppBar extends ConsumerWidget implements PreferredSizeWidget {
                   Flexible(
                     child: Text(
                       s.tr('হাসপাতাল ও রিমাইন্ডার', 'Find Care & Reminders'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            PopupMenuItem(
+              value: 'onboarding',
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.verified_user_rounded,
+                    color: AppColors.indigoSoft,
+                  ),
+                  const SizedBox(width: 10),
+                  Flexible(
+                    child: Text(
+                      s.tr('লগইন ও গোপনীয়তা সম্মতি', 'Login & Privacy Consent'),
                     ),
                   ),
                 ],

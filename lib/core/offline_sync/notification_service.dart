@@ -94,7 +94,9 @@ class NotificationService {
         tz.setLocalLocation(tz.getLocation('Asia/Dhaka'));
       } catch (_) {}
 
-      const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+      const androidInit = AndroidInitializationSettings(
+        '@drawable/ic_stat_shuchona',
+      );
       const darwinInit = DarwinInitializationSettings(
         requestAlertPermission: false,
         requestBadgePermission: false,
@@ -167,6 +169,7 @@ class NotificationService {
           channelDescription: 'Bangla voice dosage and daily health reminders',
           importance: Importance.high,
           priority: Priority.high,
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
         iOS: DarwinNotificationDetails(),
       );
@@ -211,6 +214,7 @@ class NotificationService {
           channelDescription: 'High-priority blood SOS and urgent alerts',
           importance: Importance.max,
           priority: Priority.max,
+          largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
         ),
         iOS: DarwinNotificationDetails(),
       );

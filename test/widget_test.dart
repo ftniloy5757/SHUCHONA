@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shuchona/app.dart';
 import 'package:shuchona/core/localization/app_locale.dart';
+import 'package:shuchona/core/offline_sync/app_state_providers.dart';
 import 'package:shuchona/core/seed_data/blood_donors_seed.dart';
 import 'package:shuchona/core/seed_data/dgda_dims_drug_dataset.dart';
 import 'package:shuchona/core/seed_data/red_flag_rules.dart';
@@ -101,15 +102,30 @@ void main() {
     });
   });
 
-  testWidgets('SHUCHONA boots cleanly into Bangla onboarding & consent flow',
+  testWidgets(
+      'SHUCHONA auto-logs into Demo Mode on fresh install and supports onboarding/consent flow',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const ProviderScope(child: ShuchonaApp()));
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const ShuchonaApp(),
+      ),
+    );
     await tester.pump(const Duration(milliseconds: 300));
 
+    // Testers land directly on Home Dashboard without credentials
     expect(find.textContaining('সূচনা'), findsWidgets);
+    expect(find.text('কথা বলে সাহায্য নিন'), findsOneWidget);
+
+    // Signing out opens the Audio-Visual Onboarding & Consent flow cleanly
+    await container.read(userSessionProvider.notifier).signOutToOnboarding();
+    await tester.pumpAndSettle();
+
     expect(find.text('অফলাইন ডেমো মোডে সরাসরি শুরু করুন'), findsOneWidget);
 
-    // Tap Instant Offline Demo Mode -> Mandatory Informed Consent Screen appears
     await tester.tap(find.text('অফলাইন ডেমো মোডে সরাসরি শুরু করুন'));
     await tester.pumpAndSettle();
 

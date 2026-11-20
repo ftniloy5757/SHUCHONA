@@ -10,6 +10,7 @@ import 'package:shuchona/core/theme/app_colors.dart';
 import 'package:shuchona/core/tts_stt/tts_listen_button.dart';
 import 'package:shuchona/core/tts_stt/voice_service.dart';
 import 'package:shuchona/core/widgets/accessible_card.dart';
+import 'package:shuchona/core/widgets/shuchona_logo.dart';
 import 'package:shuchona/features/find_care/find_care_provider.dart';
 
 enum _BreathPhase { inhale, hold, exhale }
@@ -139,8 +140,20 @@ class _CravingSosModalState extends ConsumerState<CravingSosModal> {
         systemOverlayStyle: isDark
             ? SystemUiOverlayStyle.light
             : SystemUiOverlayStyle.dark,
-        title: Text(
-          s.tr('শান্ত হোন — সূচনা আপনার পাশে আছে', 'Calm Support — You Are Safe'),
+        title: Row(
+          children: [
+            const ShuchonaLogo(size: 28),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                s.tr(
+                  'শান্ত হোন — সূচনা পাশে আছে',
+                  'Calm Support — You Are Safe',
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
         leading: IconButton(
           icon: const Icon(Icons.close_rounded, size: 28),

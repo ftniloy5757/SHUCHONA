@@ -12,6 +12,7 @@ import 'package:shuchona/core/widgets/accessible_card.dart';
 import 'package:shuchona/core/widgets/mandatory_disclaimer_banner.dart';
 import 'package:shuchona/core/widgets/severity_badge.dart';
 import 'package:shuchona/core/widgets/shuchona_app_bar.dart';
+import 'package:shuchona/core/widgets/shuchona_logo.dart';
 import 'package:shuchona/features/find_care/find_care_provider.dart';
 import 'package:shuchona/features/voice_chatbot/chatbot_provider.dart';
 
@@ -235,6 +236,8 @@ class _VoiceChatbotScreenState extends ConsumerState<VoiceChatbotScreen> {
                       children: [
                         Row(
                           children: [
+                            const ShuchonaLogo(size: 28),
+                            const SizedBox(width: 8),
                             Expanded(
                               child: SeverityBadge(
                                 label: s.tr(

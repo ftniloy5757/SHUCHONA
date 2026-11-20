@@ -251,18 +251,46 @@ class UserSessionState {
 }
 
 class UserSessionNotifier extends StateNotifier<UserSessionState> {
-  UserSessionNotifier() : super(_load());
+  UserSessionNotifier() : super(_load()) {
+    // Persist the initial auto-demo session on first launch after installation
+    // so testers stay signed in seamlessly across app restarts.
+    final s = HiveStorageService.instance;
+    if (state.isOnboardingComplete &&
+        s.read<bool>(AppConstants.boxProfile, 'is_auth') == null &&
+        (s.read<bool>(AppConstants.boxProfile, 'explicitly_signed_out') ??
+                false) ==
+            false) {
+      s.write(AppConstants.boxProfile, 'is_auth', true);
+      s.write(AppConstants.boxProfile, 'has_consent', true);
+      s.write(AppConstants.boxProfile, 'is_demo', true);
+      s.write(
+        AppConstants.boxProfile,
+        'identifier',
+        state.displayIdentifier,
+      );
+    }
+  }
 
   static UserSessionState _load() {
     final s = HiveStorageService.instance;
+    final explicitlySignedOut =
+        s.read<bool>(AppConstants.boxProfile, 'explicitly_signed_out') ?? false;
+    final savedAuth = s.read<bool>(AppConstants.boxProfile, 'is_auth');
+    final savedConsent = s.read<bool>(AppConstants.boxProfile, 'has_consent');
+
+    // Auto-login as a Demo Tester immediately after fresh installation so users
+    // and testers can experience every SHUCHONA feature without credentials.
+    final autoDemoOnInstall =
+        !explicitlySignedOut && savedAuth == null && savedConsent == null;
+
     return UserSessionState(
-      isAuthenticated: s.read<bool>(AppConstants.boxProfile, 'is_auth') ?? false,
+      isAuthenticated: autoDemoOnInstall ? true : (savedAuth ?? false),
       hasGivenInformedConsent:
-          s.read<bool>(AppConstants.boxProfile, 'has_consent') ?? false,
+          autoDemoOnInstall ? true : (savedConsent ?? false),
       isDemoMode: s.read<bool>(AppConstants.boxProfile, 'is_demo') ?? true,
       displayIdentifier:
           s.read<String>(AppConstants.boxProfile, 'identifier') ??
-              '+880 17XX-XXXXXX',
+              'SHG Demo Tester (Savar)',
       pseudonymBn:
           s.read<String>(AppConstants.boxProfile, 'pseudonym_bn') ?? 'শাপলা কলি',
       pseudonymEn: s.read<String>(AppConstants.boxProfile, 'pseudonym_en') ??
@@ -286,6 +314,8 @@ class UserSessionNotifier extends StateNotifier<UserSessionState> {
       isDemoMode: isDemoMode,
       displayIdentifier: identifier,
     );
+    await HiveStorageService.instance
+        .write(AppConstants.boxProfile, 'explicitly_signed_out', false);
     await HiveStorageService.instance
         .write(AppConstants.boxProfile, 'is_auth', true);
     await HiveStorageService.instance
@@ -342,6 +372,8 @@ class UserSessionNotifier extends StateNotifier<UserSessionState> {
       isAuthenticated: false,
       hasGivenInformedConsent: false,
     );
+    await HiveStorageService.instance
+        .write(AppConstants.boxProfile, 'explicitly_signed_out', true);
     await HiveStorageService.instance
         .write(AppConstants.boxProfile, 'is_auth', false);
     await HiveStorageService.instance

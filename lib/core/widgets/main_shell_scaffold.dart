@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shuchona/core/localization/app_strings.dart';
 import 'package:shuchona/core/offline_sync/app_state_providers.dart';
+import 'package:shuchona/core/offline_sync/notification_service.dart';
 import 'package:shuchona/core/theme/app_colors.dart';
 import 'package:shuchona/features/prescribe_safe/prescribe_safe_provider.dart';
 import 'package:shuchona/features/voice_chatbot/chatbot_provider.dart';
@@ -10,13 +11,31 @@ import 'package:shuchona/features/womens_symptom_guide/symptom_guide_provider.da
 
 /// Main App Shell with bottom navigation bar and persistent centered floating
 /// Voice Microphone CTA (`সূচনা কে বলুন` / `Speak to SHUCHONA`).
-class MainShellScaffold extends ConsumerWidget {
+class MainShellScaffold extends ConsumerStatefulWidget {
   const MainShellScaffold({super.key, required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MainShellScaffold> createState() => _MainShellScaffoldState();
+}
+
+class _MainShellScaffoldState extends ConsumerState<MainShellScaffold> {
+  @override
+  void initState() {
+    super.initState();
+    // Auto-demo testers land straight on Home after installation, so request
+    // Android 13+ notification permissions gently once the main shell mounts.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        NotificationService.instance.requestPermissions();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final navigationShell = widget.navigationShell;
     final locale = ref.watch(localeProvider);
     final isDark = ref.watch(highContrastDarkProvider);
     final isGuest = ref.watch(shgGuestModeProvider);

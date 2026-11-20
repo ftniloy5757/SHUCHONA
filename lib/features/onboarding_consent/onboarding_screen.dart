@@ -10,6 +10,7 @@ import 'package:shuchona/core/theme/app_colors.dart';
 import 'package:shuchona/core/tts_stt/tts_listen_button.dart';
 import 'package:shuchona/core/tts_stt/voice_service.dart';
 import 'package:shuchona/core/widgets/accessible_card.dart';
+import 'package:shuchona/core/widgets/shuchona_logo.dart';
 import 'package:shuchona/features/blood_alert/blood_alert_provider.dart';
 
 /// Module 1: Authentication (Phone OTP / Email / Instant Offline Demo Mode)
@@ -137,7 +138,18 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(s.tr('সূচনা', 'SHUCHONA')),
+        title: Row(
+          children: [
+            const ShuchonaLogo(size: 32),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                s.tr('সূচনা', 'SHUCHONA'),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
         actions: [
           TextButton.icon(
             onPressed: () => ref.read(localeProvider.notifier).toggle(),
@@ -206,24 +218,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             children: [
               Row(
                 children: [
-                  Container(
-                    width: 60,
-                    height: 60,
-                    decoration: BoxDecoration(
-                      color: primary,
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'সূ',
-                        style: TextStyle(
-                          color: isDark ? AppColors.darkCanvas : Colors.white,
-                          fontSize: 34,
-                          fontWeight: FontWeight.w900,
-                        ),
-                      ),
-                    ),
-                  ),
+                  const ShuchonaLogo(size: 64),
                   const SizedBox(width: 14),
                   Expanded(
                     child: Column(
@@ -449,11 +444,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
             children: [
               Row(
                 children: [
-                  const Icon(
-                    Icons.verified_user_rounded,
-                    color: AppColors.secondaryEmerald,
-                    size: 34,
-                  ),
+                  const ShuchonaLogo(size: 46),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
